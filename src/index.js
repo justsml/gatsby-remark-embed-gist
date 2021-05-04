@@ -164,6 +164,7 @@ export default async ({ markdownAST }, options = {}) => {
     const content = await response.json();
 
     let html = content.div;
+    const truncate = Boolean(query.truncate);
     const hasLines = query.lines.length > 0;
     const hasHighlights = query.highlights.length > 0;
 
@@ -175,11 +176,12 @@ export default async ({ markdownAST }, options = {}) => {
             .replace(/[^a-zA-Z0-9_]+/g, "-")
             .toLowerCase()
         : "";
+      const selectorPrefix = truncate ? `#LC` : `#file-${file}-LC`
 
       // highlight the specify lines, if any
       if (hasHighlights) {
         query.highlights.forEach((line) => {
-          $(`#file-${file}-LC${line}`).addClass("highlighted");
+          $(`${selectorPrefix}${line}`).addClass("highlighted");
         });
       }
 
@@ -189,7 +191,7 @@ export default async ({ markdownAST }, options = {}) => {
         codeLines.forEach((line) => {
           if (query.lines.includes(line)) return;
 
-          $(`#file-${file}-LC${line}`).parent().remove();
+          $(`${selectorPrefix}${line}`).parent().remove();
         });
       }
 
