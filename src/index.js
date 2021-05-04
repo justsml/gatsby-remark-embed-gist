@@ -164,11 +164,17 @@ export default async ({ markdownAST }, options = {}) => {
     const content = await response.json();
 
     let html = content.div;
-    const truncate = Boolean(query.truncate);
+    const truncate = Boolean(query.truncate) || options.truncate;
     const hasLines = query.lines.length > 0;
     const hasHighlights = query.highlights.length > 0;
 
     if (hasHighlights || hasLines) {
+      if (truncate} {
+        html = html.replace(/\bfile-[^\s]*-L/g, 'L');
+        html = html.replace(/blob-code blob-code-inner ?/g, 'b-c ');
+        html = html.replace(/ data-line-number="/g, ' line-num="');
+        html = html.replace(/ class="blob-num [^\s]*-line-number"/g, '');
+      }
       const $ = cheerio.load(html);
       const file = query.file
         ? query.file
